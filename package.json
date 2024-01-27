@@ -1,6 +1,9 @@
 {
-  "dependencies": {
-    "inquirer": "^8.2.6",
-    "mysql": "^2.18.1"
-  }
+    "dependencies": {
+        "inquirer": "^8.2.6",
+        "mysql2": "^3.9.0"
+    },
+    "devDependencies": {
+        "@faker-js/faker": "^8.4.0"
+    }
 }
