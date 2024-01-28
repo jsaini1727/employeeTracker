@@ -1,10 +1,5 @@
-
-const fs = require('fs');
+const { viewDepartments, viewRoles, viewEmployees, addDepartment} = require('./functions');
 const inquirer = require('inquirer');
-const connection = require('./db/connection');
-const util = require('util');
-const { viewDepartments, viewRoles, viewEmployees} = require('./functions');
-connection.query = util.promisify(connection.query);
 
 function menu() {
     inquirer.prompt([{
@@ -36,23 +31,11 @@ function menu() {
                 updateEmployeeRole();
                 break;
             case 'Quit':
-                connection.end();
-                break;
+               process.exit();
+                
         }
     })
 };
 
 
-menu()
-
-
-// SELECT employee.id, employee.first_name AS "first name", employee.last_name 
-//                     AS "last name", role.title, department.name AS department, role.salary, 
-//                     concat(manager.first_name, " ", manager.last_name) AS manager
-//                     FROM employee
-//                     LEFT JOIN role
-//                     ON employee.role_id = role.id
-//                     LEFT JOIN department
-//                     ON role.department_id = department.id
-//                     LEFT JOIN employee manager
-//                     ON manager.id = employee.manager_id`
+module.exports = { menu}
