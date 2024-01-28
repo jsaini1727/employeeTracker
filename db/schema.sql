@@ -15,7 +15,7 @@ CREATE TABLE role(
     salary DECIMAL,
     department_id INT NOT NULL,
     -- needs a foreign key referenced to department table id
-    FOREIGN KEY(department_id) REFERENCES department(id)
+    FOREIGN KEY(department_id) REFERENCES department(id) ON DELETE CASCADE
 );
 
 CREATE TABLE employee(
@@ -24,9 +24,9 @@ CREATE TABLE employee(
     last_name VARCHAR(30),
     role_id INT NOT NULL,
     -- needs a foreign key referenced to role table id
-    FOREIGN KEY(role_id) REFERENCES role(id),
+    FOREIGN KEY(role_id) REFERENCES role(id) ON DELETE CASCADE,
     manager_id INT,
     -- needs a foreign key referenced to manager table id
-    FOREIGN KEY(manager_id) REFERENCES employee(id)
+    FOREIGN KEY(manager_id) REFERENCES employee(id) ON DELETE SET NULL
 );
 
