@@ -34,7 +34,7 @@ function menu() {
                 addEmployee();
                 break;
             case 'Update an employee role':
-                // updateEmployeeRole();
+                updateEmployeeRole();
                 break;
             case 'Quit':
                 connection.end();
@@ -126,6 +126,7 @@ function addRole() {
         ]).then(answers => {
             connection.query(`INSERT INTO role (title, salary, department_id) VALUES ('${answers.new_role}','${answers.salary}','${answers.department_id}')`, (err, data) => {
                 if (err) throw err;
+                console.log('The new role is added successfully');
                 menu()
             })
         })
@@ -137,15 +138,19 @@ function addEmployee() {
     connection.query('SELECT * FROM role;', (err, data) => {
         const roleOptions = data.map(role => role.title);
 
-        connection.query('SELECT * FROM employee;', (err, employeeData) => {
-            managerOptions = employeeData.map(employee => {
-                return {
-                    name: `${employee.first_name} ${employee.last_name}`,
-                    value: employee.manager_id == null
-                };
-            });
-            managerOptions.unshift({ name: 'None', value: null });
 
+        connection.query('SELECT id, first_name, last_name FROM employee WHERE manager_id IS NULL', (err, employeeData) =>{
+            if (err) throw err;
+            const managerOptions = employeeData.map(employee =>{
+                return{
+                    name: `${employee.first_name} ${employee.last_name}`,
+                    value: employee.id
+                }
+
+            })
+            managerOptions.unshift({ name: 'None', value: null });
+            
+            
             inquirer.prompt([
                 {
                     type: 'text',
@@ -170,12 +175,22 @@ function addEmployee() {
                     choices: managerOptions,
                 }
             ]).then(answers => {
-                connection.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${answers.first_name}','${answers.last_name}','${answers.role}', '${answers.manager}')`, (err, data) => {
+                connection.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) 
+                SELECT '${answers.first_name}','${answers.last_name}', r.id, '${answers.manager}' FROM employee e LEFT JOIN role r on e.role_id = r.id WHERE r.title = '${answers.role}'`, (err, data) => {
                     if (err) throw err;
-                    menu()
+                    console.log('Employee added successfully');
+
+                    menu();
+              
                 }
                 );
             });
         });
     })
-}
+    }
+
+    // Function to update an employee role
+    function updateEmployeeRole(){
+
+    }
+    
