@@ -36,6 +36,18 @@ function menu() {
             case 'Update an employee role':
                 updateEmployeeRole();
                 break;
+            // case 'View employees by manager':
+            //     viewManagerEmployees();
+            //     break;
+            // case 'View employees by department':
+            //     viewDepartmentEmployees();
+            //     break;
+            // case 'Update an Employee Manager':
+            //     updateEmployeeManager();
+            //     break;
+            // case 'View the combined salaries of all employees in a department':
+            //     viewDepartmentSalariesTotal();
+            //     break;
             case 'Quit':
                 connection.end();
                 break;
@@ -139,18 +151,17 @@ function addEmployee() {
         const roleOptions = data.map(role => role.title);
 
 
-        connection.query('SELECT id, first_name, last_name FROM employee WHERE manager_id IS NULL', (err, employeeData) =>{
+        connection.query('SELECT id, first_name, last_name FROM employee WHERE manager_id IS NULL', (err, employeeData) => {
             if (err) throw err;
-            const managerOptions = employeeData.map(employee =>{
-                return{
+            const managerOptions = employeeData.map(employee => {
+                return {
                     name: `${employee.first_name} ${employee.last_name}`,
                     value: employee.id
                 }
 
             })
             managerOptions.unshift({ name: 'None', value: null });
-            
-            
+
             inquirer.prompt([
                 {
                     type: 'text',
@@ -181,16 +192,51 @@ function addEmployee() {
                     console.log('Employee added successfully');
 
                     menu();
-              
+
                 }
                 );
             });
         });
     })
-    }
+}
 
-    // Function to update an employee role
-    function updateEmployeeRole(){
+// Function to update an employee role
+function updateEmployeeRole() {
+    connection.query('SELECT * FROM employee', (err, data) => {
+        const employeeOptions = data.map(({ id, first_name, last_name }) => ({
+            name: `${first_name} ${last_name}`,
+            value: id
+        }))
 
-    }
-    
+        connection.query('SELECT * FROM role r JOIN department d ON r.department_id = d.id', (err, data) => {
+            const roleOptions = data.map(({ id, title, name }) => ({
+                name: `${title} / ${name}`,
+                value: id
+            }))
+
+            inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'employee_id',
+                    message: 'please select from the following list: ',
+                    choices: employeeOptions
+                },
+                {
+                    type: 'list',
+                    name: 'role_id',
+                    message: 'Please choose the new role for the   employee ',
+                    choices: roleOptions
+                },
+
+            ])
+                .then(answers => {
+                    connection.query(`UPDATE employee SET role_id = ? WHERE id = ?`, [answers.role_id, answers.employee_id], (err, data) => {
+                        if (err) throw err;
+                        console.log('The new role is updated successfully');
+                        menu()
+                    })
+                })
+        });
+
+    })
+}
