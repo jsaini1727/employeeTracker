@@ -187,17 +187,16 @@ function addEmployee() {
                 }
             ]).then(answers => {
                 connection.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) 
-                SELECT '${answers.first_name}','${answers.last_name}', r.id, '${answers.manager}' FROM employee e LEFT JOIN role r on e.role_id = r.id WHERE r.title = '${answers.role}'`, (err, data) => {
+                SELECT '${answers.first_name}','${answers.last_name}', r.id, ${answers.manager} FROM employee e LEFT JOIN role r on e.role_id = r.id WHERE r.title = '${answers.role}'`, (err, data) => {
                     if (err) throw err;
                     console.log('Employee added successfully');
 
                     menu();
-
-                }
-                );
+                    
+                });
             });
         });
-    })
+    });
 }
 
 // Function to update an employee role
@@ -224,7 +223,7 @@ function updateEmployeeRole() {
                 {
                     type: 'list',
                     name: 'role_id',
-                    message: 'Please choose the new role for the   employee ',
+                    message: 'Please choose the new role for the employee ',
                     choices: roleOptions
                 },
 
